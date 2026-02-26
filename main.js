@@ -1842,8 +1842,11 @@
       drawPortIconBase(port.x, port.y, isCurrent);
       drawCityIcon(port, isCurrent);
 
-      ctx.fillStyle = "#102238";
+      ctx.strokeStyle = "rgba(9, 28, 44, 0.82)";
+      ctx.lineWidth = 3.2;
       ctx.font = "18px 'Press Start 2P', monospace";
+      ctx.strokeText(port.name, port.x + 13, port.y - 14);
+      ctx.fillStyle = "#f4fbff";
       ctx.fillText(port.name, port.x + 13, port.y - 14);
     }
   }

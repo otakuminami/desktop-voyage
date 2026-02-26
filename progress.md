@@ -184,3 +184,9 @@ TODO / 下一步建议：
   - Vercel 项目：`desktop-voyage-web`（已连接 GitHub 仓库自动部署）。
   - 线上地址：`https://desktop-voyage-web.vercel.app`。
   - 验证：`curl -I` 返回 `HTTP/2 200`。
+- UI文案与样式调整：
+  - 地图城市名称改为白色字体，并添加深色描边增强可读性。
+  - 右侧“港口目标”改为“目的地”。
+  - 按钮“设为港口目标”改为“前往港口”。
+  - 回归：`node --check main.js` 通过；`web_game_playwright_client.js`（`output/web-game-ui-label-cityname-white-check`）通过，无 `errors-0.json`。
+  - 截图：`output/web-game-ui-label-cityname-white-check/shot-0.png`。
