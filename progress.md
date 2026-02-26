@@ -179,3 +179,8 @@ TODO / 下一步建议：
   - 实现：`PORT_ICON_SCALE` 从 `1.65` 调整为 `2.5`。
   - 回归：`node --check main.js` 通过；`web_game_playwright_client.js`（`output/web-game-city-icons-scale2_5-check`）通过，无 `errors-0.json`。
   - 截图：`output/web-game-city-icons-scale2_5-check/shot-0.png`。
+- 发布上线：已完成 GitHub + Vercel 在线部署。
+  - GitHub 仓库：`https://github.com/otakuminami/desktop-voyage`（`main` 已推送）。
+  - Vercel 项目：`desktop-voyage-web`（已连接 GitHub 仓库自动部署）。
+  - 线上地址：`https://desktop-voyage-web.vercel.app`。
+  - 验证：`curl -I` 返回 `HTTP/2 200`。
