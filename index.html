@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>桌面大航海</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-bg"></div>
+    <div class="app">
+      <header class="topbar">
+        <h1>桌面大航海</h1>
+        <div class="sub">设定目标，尽可能活得更久。</div>
+      </header>
+
+      <main class="layout">
+        <section class="map-panel">
+          <canvas id="world" width="1400" height="900" aria-label="游戏海图"></canvas>
+          <div id="rescueBanner" class="rescue-banner hidden"></div>
+        </section>
+
+        <aside class="hud-panel">
+          <section class="card">
+            <h2>状态</h2>
+            <div class="stat-row"><span>耐久</span><strong id="hullStat">100</strong></div>
+            <div class="stat-row"><span>补给</span><strong id="supplyStat">100</strong></div>
+            <div class="stat-row"><span>金币</span><strong id="goldStat">0</strong></div>
+            <div class="stat-row"><span>存活</span><strong id="timeStat">00:00:00</strong></div>
+            <div class="stat-row"><span>模式</span><strong id="modeStat">航行</strong></div>
+          </section>
+
+          <section class="card">
+            <h2>航行</h2>
+            <label for="portSelect">港口目标</label>
+            <div class="input-row">
+              <select id="portSelect"></select>
+              <button id="setPortBtn" type="button">设为港口目标</button>
+            </div>
+
+            <div id="coordTargetGroup" class="hidden-control">
+              <label>坐标目标（X,Y）</label>
+              <div class="input-row split">
+                <input id="targetX" type="number" min="0" max="1400" step="1" placeholder="X" />
+                <input id="targetY" type="number" min="0" max="900" step="1" placeholder="Y" />
+                <button id="setCoordBtn" type="button">设为坐标目标</button>
+              </div>
+            </div>
+
+            <div class="meta-row">
+              <span>当前目标</span>
+              <strong id="targetLabel">无</strong>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>航海日志</h2>
+            <ul id="logList"></ul>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <div id="eventModal" class="event-modal hidden" role="dialog" aria-modal="true">
+      <div class="event-card">
+        <h3 id="eventTitle">事件</h3>
+        <p id="eventDesc"></p>
+        <div id="eventOptions" class="event-options"></div>
+      </div>
+    </div>
+
+    <script src="./main.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,314 @@
+:root {
+  --ocean-dark: #0b2948;
+  --ocean-mid: #12618d;
+  --ocean-light: #3da9d6;
+  --panel-bg: rgba(8, 22, 44, 0.9);
+  --panel-border: #7bb8de;
+  --accent: #f2c572;
+  --danger: #e57353;
+  --ok: #91d18b;
+  --text-main: #e8f4fb;
+  --text-dim: #b7d6e8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  color: var(--text-main);
+  background: #06172e;
+  font-family: "VT323", "Courier New", monospace;
+}
+
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+.app-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 20% 20%, #1f5a89 0%, transparent 35%),
+    radial-gradient(circle at 80% 10%, #1b3e66 0%, transparent 30%),
+    linear-gradient(165deg, #06172e, #0b2948 50%, #0a1f37 100%);
+  pointer-events: none;
+}
+
+.app {
+  position: relative;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 18px;
+}
+
+.topbar {
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 2px solid var(--panel-border);
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35), 0 12px 24px rgba(4, 9, 18, 0.35);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.3;
+  font-family: "Press Start 2P", "Courier New", monospace;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+
+.topbar .sub {
+  margin-top: 8px;
+  font-size: 22px;
+  color: var(--text-dim);
+}
+
+.layout {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  align-items: start;
+}
+
+.map-panel {
+  position: relative;
+  border: 2px solid var(--panel-border);
+  background: rgba(3, 14, 27, 0.7);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35), 0 12px 24px rgba(4, 9, 18, 0.4);
+  overflow: hidden;
+}
+
+#world {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 14 / 9;
+  image-rendering: pixelated;
+}
+
+.rescue-banner {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 12px;
+  padding: 8px 12px;
+  border: 2px solid #ffcf96;
+  color: #2f1a05;
+  background: #ffd59b;
+  font-size: 24px;
+  line-height: 1.2;
+  box-shadow: 0 4px 0 rgba(101, 70, 26, 0.35);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.hud-panel {
+  display: grid;
+  gap: 12px;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.card {
+  border: 2px solid var(--panel-border);
+  padding: 10px;
+  background: var(--panel-bg);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-family: "Press Start 2P", "Courier New", monospace;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.stat-row,
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+  font-size: 24px;
+}
+
+.stat-row strong,
+.meta-row strong {
+  font-weight: 700;
+}
+
+label {
+  display: block;
+  margin: 8px 0 4px;
+  font-size: 22px;
+  color: var(--text-dim);
+}
+
+.input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.input-row.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+}
+
+.hidden-control {
+  display: none;
+}
+
+input,
+select,
+button {
+  border: 2px solid #7aa8c6;
+  background: #0e3356;
+  color: var(--text-main);
+  padding: 5px 7px;
+  font-size: 20px;
+  font-family: "VT323", "Courier New", monospace;
+}
+
+button {
+  background: #225078;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2d6595;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+#logList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-height: 0;
+  max-height: none;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.hud-panel .card:last-child {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+#logList li {
+  font-size: 21px;
+  color: var(--text-dim);
+  border-bottom: 1px dashed rgba(144, 193, 224, 0.3);
+  padding: 2px 0;
+}
+
+.event-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 10, 20, 0.66);
+  display: grid;
+  place-items: center;
+  z-index: 20;
+}
+
+.event-card {
+  width: min(680px, 94vw);
+  border: 2px solid #ffd598;
+  background: #102945;
+  color: #f4f8fb;
+  padding: 14px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.45), 0 16px 24px rgba(0, 0, 0, 0.35);
+}
+
+.event-card h3 {
+  margin: 0 0 8px;
+  font-family: "Press Start 2P", "Courier New", monospace;
+  color: #ffd598;
+  font-size: 16px;
+}
+
+.event-card p {
+  margin: 0 0 10px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.event-options {
+  display: grid;
+  gap: 8px;
+}
+
+.event-options button {
+  width: 100%;
+  text-align: left;
+  padding: 7px 9px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hud-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+
+  .hud-panel .card:last-child {
+    grid-column: 1 / -1;
+    display: block;
+  }
+
+  #logList {
+    min-height: 92px;
+    max-height: 170px;
+    flex: initial;
+  }
+}
+
+@media (max-width: 760px) {
+  .app {
+    padding: 10px;
+  }
+
+  .topbar h1 {
+    font-size: 18px;
+  }
+
+  .topbar .sub {
+    font-size: 18px;
+  }
+
+  .hud-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .rescue-banner {
+    font-size: 20px;
+  }
+}

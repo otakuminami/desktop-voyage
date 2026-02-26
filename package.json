@@ -1,0 +1,13 @@
+{
+  "name": "desktop-voyage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "python3 -m http.server 4173",
+    "test:playwright-loop": "node /Users/otakuminami/.codex/skills/develop-web-game/scripts/web_game_playwright_client.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2"
+  }
+}

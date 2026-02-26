@@ -1,0 +1,181 @@
+Original prompt: 我今天要开始一个项目，让我们先规划下这个项目，你可以使用问题模式和我沟通需求，一次一个问题吧。我先大致说一下我心里的想法，请你帮我进行规划。我想做一个网站，内容是用户可以在网站里行驶和经营自己的小船，就好像很古早的一个游戏“大航海时代 2”。但是操作不用和游戏一样复杂，只需要用户设置目标和处理一些随机事件就好。然后玩家的存档保存在玩家电脑中。
+
+- 已完成：PRD.md 与 README.md 创建并同步。
+- 当前任务：按 PRD 搭建可运行 MVP 骨架（原生 HTML/CSS/JS）。
+- 待办：实现地图、自动航行、事件系统、救援倒计时、自动存档、render_game_to_text、advanceTime，并用 Playwright 验证。
+
+- 已完成：新增 index.html / styles.css / main.js，包含 Canvas 海图、港口导航、坐标导航、事件系统、救援休整、自动存档。
+- 已完成：实现 window.render_game_to_text 与 window.advanceTime，满足自动测试钩子要求。
+- 待验证：运行 Playwright 脚本检查截图、状态文本与控制台错误。
+- 已补充：坐标输入默认值（980,500）以支持自动化一键起航验证。
+- 已补充：快捷键 A/B/Space 分别用于事件触发、救援触发、事件首选项确认（用于测试链路）。
+- 已完成验证：Playwright 场景测试通过
+  - 坐标起航：船位置变化并最终到达目标
+  - 事件链路：A 触发事件 + Space 选择，数值正确变化
+  - 救援链路：B 触发救援，进入 rescue 模式并有 30 分钟倒计时
+- 已完成：README 增补运行方法与控制说明，新增 .gitignore。
+
+TODO / 下一步建议：
+- 将事件 UI 从 DOM 弹窗迁移到 Canvas 内渲染，以便截图测试可见。
+- 补充真实底图资源（瓦片或简化矢量）并校准陆地碰撞区。
+- 增加新手引导（首次进入时提示目标设置和生存规则）。
+- 为 localStorage 增加备份槽与损坏回滚机制。
+- 修复：港口停留超过 5 秒后设置第二目标时，船会被自动停靠逻辑反复拉回港口导致看起来不动。
+  - 处理：仅在“无目标”或“目标就是当前附近港口”时才触发自动停靠。
+- 回归：复现脚本验证“到港 -> 等待 -> 设第二港口目标 -> 正常离港并到达”通过。
+- 已完成：界面文案改为中文（标题、状态栏、导航区、日志、事件弹窗）。
+- 已完成：随机事件池全部改为中文文案（标题、描述、选项、结果）。
+- 已完成：日志提示与救援提示改为中文。
+- 修复：事件选择后新增“事件结果”展示页（显示摘要+数值变化），点击“继续航行”后恢复航行。
+- 修复：解决刷新后可能卡在 event 模式导致船不移动的问题。
+  - 处理：加载存档时若检测到未完整持久化的 event 模式，自动恢复到 sailing 并重置下次事件计时。
+- 回归：验证了事件结果展示、继续后恢复航行、事件中重载后仍可设置目标并移动。
+- 修复增强：新增异常状态自恢复（event/rescue 残缺存档自动恢复为可航行状态）。
+- 修复增强：事件结果页支持空格键“继续航行”，不再重复结算同一事件。
+- 可操作兜底：新增“重置航程”按钮，清除当前存档并回到上海开局。
+- 修复：港口点位偏内陆/障碍区导致无法到达。
+  - 调整港口停靠点到近海可达位置：广州、香港、高雄、曼谷。
+  - 新增“临近港口时降低避障推力”逻辑，避免靠港阶段被海岸排斥推开。
+- 回归：逐港口自动导航可达性测试通过（广州、香港、高雄、长崎、釜山、新加坡、东京、曼谷、雅加达全部可达）。
+- 需求变更：地图从环形改为固定边界。
+- 实现：去除跨边界最短路径与坐标环绕，改为边界夹取（船只与路径均不可越界）。
+- 实现：越界坐标输入自动限制到边界内并提示日志。
+- 回归：验证到右边界后再设左侧目标时不会穿边，而是沿地图内长路径移动。
+- 同步文档：README 与 PRD 的边界规则已更新为固定边界。
+- 修复：避障算法升级，解决船只在障碍边缘卡住不绕行的问题。
+  - 从“仅左/右一步”改为“多角度候选绕行搜索”（含较大角度偏转）。
+  - 增加紧急脱困方向（远离最近障碍中心）。
+  - 增加碰撞区内外逸容错：若当前已贴/陷入障碍边缘，允许朝更安全方向逐步脱困。
+- 回归：复测“雅加达 -> 东京”场景，已可到港（不再卡住）。
+- 需求变更：普通进港后不再自动恢复耐久与补给。
+- 实现：删除 dockAtPort 中对 hull/supplies 置 100 的逻辑，并同步停靠日志文案。
+- 文档：PRD 已同步更新为“到港不自动恢复耐久与补给”。
+- 修复：雅加达 -> 曼谷航线出现局部最优振荡（在新加坡北侧反复横跳）导致“卡住”。
+- 实现：导航升级为“全局网格路径规划(A*) + 局部避障”双层策略。
+  - 设定目标后先规划可达路线（route waypoints）。
+  - 航行过程中沿路点推进，卡住时触发自动重规划。
+  - 保留局部避障与紧急脱困作为兜底。
+- 回归：验证“雅加达 -> 曼谷”可达；验证“雅加达 -> 曼谷 -> 东京”连续航线可达。
+- 新增：港口待机自动出发机制。
+  - 条件：船在港口、处于航行模式、且 10 秒未设置目标。
+  - 行为：随机选择“其他港口”作为新目标并立即出发。
+  - 保证：玩家手动设定目标会重置待机计时，不会被自动目标覆盖。
+- 回归：验证了 10 秒自动出发触发；验证手动设置目标不会被自动逻辑覆盖。
+- 新增：事件 8 秒超时自动代选并继续流程。
+  - 行为：事件弹出后 8 秒未操作，会随机选择一个选项并结算结果。
+  - 行为：自动代选后会展示“事件结果”，并在短暂提示后自动继续航行（无需玩家再点按钮）。
+  - 细节：`render_game_to_text` 新增 `timers.eventDecisionMs` 与 `timers.eventAutoContinueMs` 便于自动化验证。
+- 回归：`output/repro-event-timeout-auto.mjs` 通过，确认链路为“超时 -> 自动代选 -> 显示后果 -> 自动继续(航行模式)”。截图：`output/event-timeout-auto.png`。
+- 技能回归：已执行 `web_game_playwright_client.js`（输出目录 `output/web-game-timeout-check`），未发现 `errors-0.json`，截图已检查。
+- UI调整：按需求先隐藏“坐标目标（X,Y）+ 设为坐标目标”区域，仅保留港口目标设置。
+  - 实现：`index.html` 将坐标区包裹到 `#coordTargetGroup`，并在 `styles.css` 使用 `.hidden-control { display: none; }`。
+  - 文档：README 的“当前控制方式”已移除坐标输入说明。
+  - 回归：`output/repro-hide-coord-ui.mjs` 输出 `coord_group_visible: false`，全页面截图 `output/hide-coord-fullpage.png` 已确认面板无该区域。
+- 规则变更：救援期间不计入“本次存活时长”；救援完成后将存活时长重置并重新开始计时。
+  - 实现：`update()` 中把 `survivalMs` 增长移动到 `rescue` 分支之后，确保救援状态不计时。
+  - 实现：`completeRescue()` 与“离线期间休整已结束”读档分支均会重置 `survivalMs = 0`。
+  - 文档：README 与 PRD 已同步“救援暂停计时 + 结束重置并重计”规则。
+  - 回归：`output/repro-rescue-survival-reset.mjs` 通过。
+    - 5 秒航行后 `survivalSec=5`
+    - 救援中再推进 5 秒仍为 `survivalSec=5`
+    - 触发救援结束后立即变为 `survivalSec=0`
+    - 再推进 3 秒后 `survivalSec=3`
+    - 截图：`output/rescue-survival-reset.png`
+  - 技能回归：`web_game_playwright_client.js`（`output/web-game-rescue-timer-check`）无 `errors-0.json`。
+- 修复：绿色陆地与可航行区域不一致（原来碰撞/避障主要基于圆形障碍，和陆地多边形绘制不同源）。
+  - 实现：导航碰撞改为直接基于 `LAND_SHAPES` 多边形计算。
+    - 新增几何函数：`pointInPolygon`、`closestPointOnSegment`、`sampleShapeClearance`、`getLandSample`。
+    - `positionCollides/minObstacleClearance` 改为“到陆地边界的有符号距离（含海岸缓冲）”。
+    - `getEmergencyEscapeDirection/pickTurnSide` 改为基于最近海岸点，而非圆心障碍物。
+  - 调优：局部避障改为“仅贴岸或误入陆地时介入”，避免与 A* 路径互相打架。
+  - 调优：寻路网格从 `24` 降到 `16`，`maxSearchNodes` 提升到 `60000`，避免海峡被粗网格误判封死。
+  - 调优：海岸缓冲 `obstacleBuffer` 从 `10` 调整为 `2`。
+  - 回归：`output/repro-routing-land-aligned-keypaths.mjs` 通过。
+    - 上海->东京、东京->上海、上海->雅加达、雅加达->曼谷均可达。
+  - 回归：`web_game_playwright_client.js`（`output/web-game-land-align-check`）无 `errors-0.json`，截图已检查。
+- 视觉调整：城市名称字体与船图标放大（不修改碰撞体）。
+  - 实现：`drawPorts()` 字体由 `12px` 调整为 `16px`，并微调港口名偏移。
+  - 实现：`drawShip()` 仅放大三角船体与中心方块的绘制尺寸；导航/碰撞计算未变更（仍基于船中心点与陆地几何）。
+  - 回归：`web_game_playwright_client.js`（`output/web-game-font-ship-size-check`）无 `errors-0.json`。
+  - 截图：`output/font-ship-size-fullpage.png`。
+- UI微调：按反馈下调“航海日志”区域高度，减少右侧底部超出感。
+  - 实现：`#logList` 从 `min-height: 144px; max-height: 240px;` 调整为 `min-height: 92px; max-height: 170px;`。
+  - 回归：`output/repro-log-height-check.mjs` 与 `web_game_playwright_client.js`（`output/web-game-log-height-check`）通过，无 `errors-0.json`。
+  - 截图：`output/log-height-check-fullpage.png`。
+- 视觉调整：城市名进一步放大，船图标改为更像船的样式。
+  - 实现：`drawPorts()` 字号由 `16px` 调整为 `18px`，并微调名称偏移。
+  - 实现：`drawShip()` 重绘为“船体 + 甲板 + 桅杆 + 双帆 + 小旗”组合图标（仅渲染变化）。
+  - 说明：未修改任何碰撞/导航参数，碰撞体仍按原逻辑（船中心点 + 陆地几何）计算。
+  - 回归：`web_game_playwright_client.js`（`output/web-game-cityfont-shiplook-check`）通过，无 `errors-0.json`。
+  - 截图：`output/city-font-ship-look-fullpage.png`。
+- UI修复：日志底部不再超过地图底部。
+  - 实现：桌面端将 `hud-panel` 设为“三行网格（最后一行自适应）”，并让最后一个卡片（航海日志）采用 `flex` 占剩余高度。
+  - 实现：新增 `syncHudHeightWithMap()`，在桌面宽度下将右侧面板高度同步为地图面板高度；窗口缩放时自动重算。
+  - 实现：桌面端 `#logList` 改为 `flex:1; min-height:0; max-height:none;`，通过卡片内部滚动吸收溢出；移动端保留固定 min/max 高度。
+  - 验证：`output/repro-log-not-exceed-map.mjs` 输出 `logBottom <= mapBottom`（本次为 `738.1875 <= 738.53125`）。
+  - 回归：`web_game_playwright_client.js`（`output/web-game-log-align-check`）通过，无 `errors-0.json`。
+  - 截图：`output/log-not-exceed-map-fullpage.png`。
+- 新增隐藏操作：救援模式下按键盘 `↑` 连按 5 次，立即结束救援（倒计时清零）。
+  - 实现：新增 `state.rescueCheatUpCount` 计数，仅在 `mode === \"rescue\"` 时统计 `ArrowUp`，达到 5 次触发 `completeRescue()`。
+  - 细节：救援外不会累计；救援中按其他键会重置计数；进入/结束救援与读档恢复时都会清零计数。
+  - 回归：`output/repro-rescue-up-cheat.mjs` 通过。
+    - `after_4_up: rescue`
+    - `after_5_up: sailing` 且 `rescueRemainingMs=0`
+  - 技能回归：`web_game_playwright_client.js`（`output/web-game-rescue-up-cheat-check`）通过，无 `errors-0.json`。
+  - 截图：`output/rescue-up-cheat.png`。
+- 地图调整：港口坐标改为贴近陆地边缘，不再空置在海中。
+  - 实现：更新 `PORTS_RAW` 的经纬度，将上海/广州/香港/高雄/长崎/釜山/新加坡/东京/雅加达等港口放到对应陆地海岸线附近（曼谷保留原边缘点）。
+  - 验证（视觉）：`output/port-edge-visual.png`，港口点位均位于陆地边缘附近。
+  - 验证（关键航线）：`output/repro-routing-land-aligned-keypaths.mjs` 通过。
+    - 上海->东京、东京->上海、上海->雅加达、雅加达->曼谷均可达。
+  - 技能回归：`web_game_playwright_client.js`（`output/web-game-port-edge-check`）通过，无 `errors-0.json`。
+- 新增：船只航行轨迹（尾迹）并随时间逐渐消失。
+  - 实现：新增轨迹参数 `trailFadeMs / trailPointMinDistance / trailMaxPoints`，按移动距离采样轨迹点。
+  - 实现：每帧清理过期轨迹点，并在 `render()` 中绘制按年龄衰减透明度与线宽的轨迹线。
+  - 实现：在到港/新开局/读档时重置轨迹起点，避免出现瞬移长线。
+  - 调试：`render_game_to_text` 新增 `stats.trailPointCount` 用于自动化验证。
+  - 回归：`output/repro-trail-fade.mjs` 通过。
+    - 航行 5 秒后 `trailPointCount=52`（轨迹已生成）
+    - 救援静置 18 秒后 `trailPointCount=0`（轨迹已消失）
+  - 截图：`output/trail-fade-step1.png`（可见轨迹）、`output/trail-fade-step2.png`（已淡出）。
+  - 技能回归：`web_game_playwright_client.js`（`output/web-game-trail-check`）通过，无 `errors-0.json`。
+- 修复与优化：到港后轨迹不再瞬间消失，并将轨迹改成更像白色浪花。
+  - 修复：`dockAtPort()` 仅在 `source === \"rescue\"`（传送救援）时重置轨迹；正常到港仅追加终点轨迹并自然淡出。
+  - 视觉：`drawTrail()` 改为白色断续浪花线（动态虚线 + 微弱白色泡沫点），不再是单一实线。
+  - 回归：`output/repro-trail-arrival-not-instant-clear.mjs` 通过。
+    - 到港当下 `trailPointCount=60`
+    - 到港后 3 秒 `trailPointCount=60`（不会瞬时清空，随后按衰减时间继续淡出）
+  - 截图：`output/trail-arrival-step1.png`、`output/trail-arrival-step2.png`。
+  - 技能回归：`web_game_playwright_client.js`（`output/web-game-trail-style-fix-check`）通过，无 `errors-0.json`。
+- 港口微调：按反馈将“广州”移到离“香港”更远的位置（海岸线边缘）。
+  - 实现：`PORTS_RAW.guangzhou` 从 `(108.30, 21.50)` 调整为 `(105.00, 24.00)`。
+  - 验证：`output/repro-shanghai-to-guangzhou-after-move.mjs` 通过（上海->广州可达）。
+  - 截图：`output/port-guangzhou-moved.png`。
+- UI修复：底部“船只坐标/经纬度”文本不再超出黑底。
+  - 实现：`drawOverlayText()` 增加宽度兜底（超宽文本自动截断为 `...`），并添加绘制裁剪区域，确保文本不会画出背景条。
+  - 实现：保留动态字号与动态背景宽度逻辑，按可用宽度自适应。
+  - 回归：`node --check main.js` 通过。
+  - 回归：`web_game_playwright_client.js`（`output/web-game-overlay-text-check`）通过，无 `errors-0.json`。
+  - 截图：`output/web-game-overlay-text-check/shot-3.png` 已目视确认底部文字在黑底内。
+- 视觉升级：城市港口 icon 改为“按城市特色的独立图标”，不再是统一方块点。
+  - 实现：新增 `drawPortIconBase()` + `drawCityIcon()`，按 `port.id` 分别绘制专属矢量小图标。
+  - 城市图标：上海(东方明珠轮廓)、广州(广州塔)、香港(维港天际线)、高雄(港口吊机)、长崎(教堂尖顶)、釜山(山海线条)、新加坡(鱼尾狮简化)、东京(鸟居)、曼谷(佛塔)、雅加达(Monas纪念碑)。
+  - 说明：仅改渲染外观，未修改港口坐标、碰撞、导航、到港判定等逻辑。
+  - 回归：`node --check main.js` 通过。
+  - 回归：`web_game_playwright_client.js`（`output/web-game-city-icons-check`）通过，无 `errors-0.json`。
+  - 截图：`output/web-game-city-icons-check/shot-1.png`。
+- 视觉微调：城市特色 icon 整体放大。
+  - 实现：新增常量 `PORT_ICON_SCALE = 1.4`，在 `drawPortIconBase()` 与 `drawCityIcon()` 内统一 `ctx.scale(...)` 放大。
+  - 实现：城市名称偏移随 icon 轻微右上调整（`+13, -14`），避免与图标重叠。
+  - 说明：仅改渲染尺寸，不影响港口坐标、到港判定、碰撞与导航。
+  - 回归：`node --check main.js` 通过。
+  - 回归：`web_game_playwright_client.js`（`output/web-game-city-icons-bigger-check`）通过，无 `errors-0.json`。
+  - 截图：`output/web-game-city-icons-bigger-check/shot-0.png`。
+- 视觉微调：城市特色 icon 再放大一档。
+  - 实现：`PORT_ICON_SCALE` 由 `1.4` 调整为 `1.65`。
+  - 回归：`node --check main.js` 通过；`web_game_playwright_client.js`（`output/web-game-city-icons-bigger2-check`）通过，无 `errors-0.json`。
+  - 截图：`output/web-game-city-icons-bigger2-check/shot-0.png`。
+- 视觉微调：城市特色 icon 缩放调至 `2.5`。
+  - 实现：`PORT_ICON_SCALE` 从 `1.65` 调整为 `2.5`。
+  - 回归：`node --check main.js` 通过；`web_game_playwright_client.js`（`output/web-game-city-icons-scale2_5-check`）通过，无 `errors-0.json`。
+  - 截图：`output/web-game-city-icons-scale2_5-check/shot-0.png`。
